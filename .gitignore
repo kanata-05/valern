@@ -11,3 +11,5 @@ image.iso
 
 # Limine bootloader
 limine/
+
+.github/
