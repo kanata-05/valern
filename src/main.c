@@ -4,6 +4,10 @@
 #include <limine.h>
 #include "stdmem.h" // Revised memory management shifted to this library.
 #include "console.h" // Console implementation
+#include "gdt.h" // Global Descriptor Table implementation
+#include "idt.h" // Interrupt Descriptor Table implementation
+#include "pic.h" // Programmable Interrupt Controller implementation
+#include "keyboard.h" // Keyboard input handling
 
 // Set the base revision to 3, this is recommended as this is the latest
 // base revision described by the Limine boot protocol specification.
@@ -33,7 +37,6 @@ __attribute__((used, section(".limine_requests_end")))
 static volatile LIMINE_REQUESTS_END_MARKER;
 
 // Memory Managers have been shifted to stdmem.h
-// Review as required.
 
 // Halt and catch fire function.
 static void hcf(void) {
@@ -58,17 +61,35 @@ void kernel(void) {
     }
 
     // Fetch the first framebuffer.
-    struct limine_framebuffer *framebuffer = framebuffer_request.response->framebuffers[0];    // Initialize our console with the framebuffer
-    console_init(framebuffer);
+    struct limine_framebuffer *framebuffer = framebuffer_request.response->framebuffers[0];
+    
+    // Initialize our console with the framebuffer
+    console_init(framebuffer);    // Initialize CPU segmentation
+    gdt_init();
+
+    // Initialize and remap the PIC first
+    pic_init();
+    
+    // Disable all interrupts during setup
+    pic_disable();
+
+    // Initialize interrupt handling
+    idt_init();
+
+    // Initialize keyboard and its interrupt handler
+    keyboard_init();
+
+    // Enable interrupts
+    asm volatile("sti");
 
     // Write a welcome message
     console_write("Welcome to Valern!\n");
     console_write("A minimal operating system\n");
+    console_write("CPU segmentation, interrupts, and keyboard initialized!\n");
     console_draw_prompt();
 
-    // We're done with initialization, but we'll keep running
+    // We're done with initialization, now we can enter the main loop
     for (;;) {
-        // TODO: Add keyboard input handling here
-        asm ("hlt");
+        asm ("hlt");  // Halt CPU until next interrupt
     }
 }

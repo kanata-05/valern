@@ -8,7 +8,7 @@
 
 #define FONT_WIDTH VGA_FONT_WIDTH
 #define FONT_HEIGHT VGA_FONT_HEIGHT
-#define DEFAULT_FG_COLOR 0xAAAAAA  // Light gray, more authentic to old terminals
+#define DEFAULT_FG_COLOR 0x008000  // Green
 #define DEFAULT_BG_COLOR 0x000000  // Black
 
 // Console state
