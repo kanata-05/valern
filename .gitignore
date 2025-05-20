@@ -1,0 +1,13 @@
+# Build output directories
+bin/
+obj/
+iso_root/
+
+# Generated files
+*.o
+*.d
+image.hdd
+image.iso
+
+# Limine bootloader
+limine/
