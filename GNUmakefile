@@ -1,24 +1,19 @@
 # Nuke built-in rules and variables.
 MAKEFLAGS += -rR
 .SUFFIXES:
-
-# This is the name that our final executable will have.
-# Change as needed.
+# Use "find" to glob all *.c, *.S, and *.asm files in the tree and obtain the
+# object and header dependency file names.
+override SRCFILES := $(shell cd src && find -L * -type f -not -name font_loader.c | LC_ALL=C sort)
+override CFILES := $(filter %.c,$(SRCFILES))
+override ASFILES := $(filter %.S,$(SRCFILES))
+override NASMFILES := $(filter %.asm,$(SRCFILES))
+override OBJ := $(addprefix obj/,$(CFILES:.c=.c.o) $(ASFILES:.S=.S.o) $(NASMFILES:.asm=.asm.o))
+override HEADER_DEPS := $(addprefix obj/,$(CFILES:.c=.c.d) $(ASFILES:.S=.S.d))
 override OUTPUT := valern-x86_64
-
-# User controllable C compiler command.
 CC := cc
-
-# User controllable C flags.
 CFLAGS := -g -O2 -pipe
-
-# User controllable C preprocessor flags. We set none by default.
-CPPFLAGS :=
-
-# User controllable nasm flags.
+CPPFLAGS := -I src/include
 NASMFLAGS := -F dwarf -g
-
-# User controllable linker flags. We set none by default.
 LDFLAGS :=
 
 # Check if CC is Clang.
@@ -30,7 +25,6 @@ ifeq ($(CC_IS_CLANG),1)
         -target x86_64-unknown-none
 endif
 
-# Internal C flags that should not be changed by the user.
 override CFLAGS += \
     -Wall \
     -Wextra \
@@ -48,7 +42,6 @@ override CFLAGS += \
     -mno-red-zone \
     -mcmodel=kernel
 
-# Internal C preprocessor flags that should not be changed by the user.
 override CPPFLAGS := \
     -I src \
     $(CPPFLAGS) \
@@ -56,12 +49,10 @@ override CPPFLAGS := \
     -MMD \
     -MP
 
-# Internal nasm flags that should not be changed by the user.
 override NASMFLAGS += \
     -Wall \
     -f elf64
 
-# Internal linker flags that should not be changed by the user.
 override LDFLAGS += \
     -Wl,-m,elf_x86_64 \
     -Wl,--build-id=none \
@@ -70,6 +61,10 @@ override LDFLAGS += \
     -z max-page-size=0x1000 \
     -T linker.ld
 
+# Font files
+override FONT_FILES := $(wildcard src/fonts/*.psf)
+override FONT_OBJS := $(patsubst src/fonts/%.psf,obj/fonts/%.o,$(FONT_FILES))
+
 # Use "find" to glob all *.c, *.S, and *.asm files in the tree and obtain the
 # object and header dependency file names.
 override SRCFILES := $(shell cd src && find -L * -type f | LC_ALL=C sort)
@@ -77,19 +72,19 @@ override CFILES := $(filter %.c,$(SRCFILES))
 override ASFILES := $(filter %.S,$(SRCFILES))
 override NASMFILES := $(filter %.asm,$(SRCFILES))
 override OBJ := $(addprefix obj/,$(CFILES:.c=.c.o) $(ASFILES:.S=.S.o) $(NASMFILES:.asm=.asm.o))
-override HEADER_DEPS := $(addprefix obj/,$(CFILES:.c=.c.d) $(ASFILES:.S=.S.d))
+override HEADER_DEPS := $(addprefix obj/,$(CFILES:.c:.c.d) $(ASFILES:.S:.S.d))
 
-# Default target. This must come first, before header dependencies.
 .PHONY: all
 all: bin/$(OUTPUT)
+	./build.sh
 
 # Include header dependencies.
 -include $(HEADER_DEPS)
 
 # Link rules for the final executable.
-bin/$(OUTPUT): GNUmakefile linker.ld $(OBJ)
+bin/$(OUTPUT): GNUmakefile linker.ld $(OBJ) $(FONT_OBJS)
 	mkdir -p "$$(dirname $@)"
-	$(CC) $(CFLAGS) $(LDFLAGS) $(OBJ) -o $@
+	$(CC) $(CFLAGS) $(LDFLAGS) $(OBJ) $(FONT_OBJS) -o $@
 
 # Compilation rules for *.c files.
 obj/%.c.o: src/%.c GNUmakefile
@@ -105,6 +100,11 @@ obj/%.S.o: src/%.S GNUmakefile
 obj/%.asm.o: src/%.asm GNUmakefile
 	mkdir -p "$$(dirname $@)"
 	nasm $(NASMFLAGS) $< -o $@
+
+# Rule for converting PSF fonts to object files
+obj/fonts/%.o: src/fonts/%.psf
+	mkdir -p obj/fonts
+	objcopy -I binary -O elf64-x86-64 -B i386:x86-64 $< $@
 
 # Remove object files and the final executable.
 .PHONY: clean
