@@ -8,7 +8,7 @@
 # Building
 
 ### Prerequisites
-Linux/Unix Enviroment (WSL2 works just fine)
+Linux/Unix Enviroment (WSL2 works just fine)  
 Virtualizer or real hardware (QEMU, Virtualbox, x86_64 compatible hardware)
 
 ### make
