@@ -2,10 +2,10 @@
 #include <stddef.h>
 #include <stdbool.h>
 #include <limine.h>
-#include "stdmem.h" // Revised memory management shifted to this library.
+#include "stdmem.h"     // Revised memory management shifted to this library.
 #include "console.h"
-#include "gdt.h" 
-#include "paging.h" 
+// #include "gdt.h"     This section has been commented out to prevent GDT 
+// #include "paging.h"  and paging from causing issues
 
 // Set the base revision to 3, this is recommended as this is the latest
 // base revision described by the Limine boot protocol specification.
@@ -27,7 +27,7 @@ __attribute__((used, section(".limine_requests_end")))
 static volatile LIMINE_REQUESTS_END_MARKER;
 
 // Global GDT instance - placed in .data section and properly aligned
-static uint8_t gdt_storage[4096] __attribute__((section(".data"), aligned(0x1000)));
+// static uint8_t gdt_storage[4096] __attribute__((section(".data"), aligned(0x1000))); This section has been commented out to prevent GDT and paging from causing issues
 
 // Halt and catch fire function.
 static void hcf(void) {
@@ -37,7 +37,7 @@ static void hcf(void) {
 }
 
 // Declare stack symbols from linker script
-extern uint64_t kernel_stack_top;
+// extern uint64_t kernel_stack_top;  This section has been commented out to prevent GDT and paging from causing issues
 
 // The following will be our kernel's entry point.
 // If renaming kernel() to something else, make sure to change the
@@ -47,6 +47,8 @@ void kernel(void) {
     if (LIMINE_BASE_REVISION_SUPPORTED == false) {
         hcf();
     }
+
+/*  This section has been commented out to prevent GDT and paging from causing issues
 
     // Disable interrupts during initialization
     __asm__ volatile("cli");    // Set up the stack pointer with proper alignment
@@ -58,8 +60,7 @@ void kernel(void) {
     gdt_init((GDT*)gdt_storage);
 
     // Initialize paging
-    init_paging();
-    printf("Paging Initialized!\n", BLUE, BLACK);
+    init_paging();  */ 
 
     // Ensure we got a framebuffer.
     if (framebuffer_request.response == NULL
@@ -72,10 +73,12 @@ void kernel(void) {
 
     // Initialize our console with the framebuffer
     init_shell(framebuffer);
-    printf("GDT Initialized!", BLUE, BLACK);
+//    printf("GDT Initialized!\n", BLUE, BLACK);
+//    printf("Paging Initialized!\n\n", BLUE, BLACK);
+
 
     printf("Welcome to Valern!\n", GRAY, BLACK);
-    printf("A minimal operating system\n\n", GRAY, BLACK);
+    printf("A minimal operating system.\n\n", GRAY, BLACK);
     
     prompt();
 

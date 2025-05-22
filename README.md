@@ -2,21 +2,37 @@
 ***megalomaniacal***  
 
 > [!IMPORTANT]
-> Valern is under active development and currently not suitable for real-world use
+> Valern is under active development and currently not suitable for real-world use  
 > (It can't even accept keyboard input)
 
 # Building
 
 ### Prerequisites
-    Linux/Unix Enviroment (WSL2 works just fine)
-    Virtualizer or real hardware (QEMU, Virtualbox, x86_64 compatible hardware)
+Linux/Unix Enviroment (WSL2 works just fine)
+Virtualizer or real hardware (QEMU, Virtualbox, x86_64 compatible hardware)
 
 ### make
 Just simply run `make` to create the kernel binaries which'll then call `build.sh`  
 to get the limine bootloader, which'll then call `build_ISO.sh` to create a bootable  
 ISO that you can use.  
 
-## Information
+# Information
+
+## Kernel Status
+Currently, the following have been implemented into the kernel:
+
+PSF font support
+GDT (Partially)
+Paging (Partially)
+
+TODO:
+Bash shell
+Keyboard Input 
+Filesystem (FAT32)
+
+However, the TODO list will shrink and grow as the project goes on.
+
+## Project
 > ### what
 valern is a small operating system   
 it's built in C and a teeny tiny bit of assembly  

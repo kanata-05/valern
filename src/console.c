@@ -42,7 +42,7 @@ void init_shell(struct limine_framebuffer* framebuffer) {
         console.font.version = 0;  // Use 0 to indicate VGA font
     } else {
         // PSF font loaded successfully
-        printf("PSF font loaded successfully!\n\n", BLUE, BLACK);
+        printf("PSF font loaded successfully!\n", BLUE, BLACK);
     }
 
     // Calculate console dimensions based on font size
