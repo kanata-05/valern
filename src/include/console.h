@@ -36,4 +36,4 @@ void putChar(char c, unsigned int fg_color, unsigned int bg_color);
 void printf(const char* str, unsigned int fg_color, unsigned int bg_color);
 void prompt(void);
 
-#endif
+#endif // CONSOLE_H

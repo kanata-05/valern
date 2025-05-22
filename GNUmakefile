@@ -1,17 +1,19 @@
 # Nuke built-in rules and variables.
 MAKEFLAGS += -rR
 .SUFFIXES:
-# Use "find" to glob all *.c, *.S, and *.asm files in the tree and obtain the
-# object and header dependency file names.
+# Use "find" to glob all *.c, *.cpp, *.S, and *.asm files in the tree
 override SRCFILES := $(shell cd src && find -L * -type f -not -name font_loader.c | LC_ALL=C sort)
 override CFILES := $(filter %.c,$(SRCFILES))
+override CPPFILES := $(filter %.cpp,$(SRCFILES))
 override ASFILES := $(filter %.S,$(SRCFILES))
 override NASMFILES := $(filter %.asm,$(SRCFILES))
-override OBJ := $(addprefix obj/,$(CFILES:.c=.c.o) $(ASFILES:.S=.S.o) $(NASMFILES:.asm=.asm.o))
-override HEADER_DEPS := $(addprefix obj/,$(CFILES:.c=.c.d) $(ASFILES:.S=.S.d))
+override OBJ := $(addprefix obj/,$(CFILES:.c=.c.o) $(CPPFILES:.cpp=.cpp.o) $(ASFILES:.S=.S.o) $(NASMFILES:.asm=.asm.o))
+override HEADER_DEPS := $(addprefix obj/,$(CFILES:.c=.c.d) $(CPPFILES:.cpp=.cpp.d) $(ASFILES:.S=.S.d))
 override OUTPUT := valern-x86_64
 CC := cc
+CXX := c++
 CFLAGS := -g -O2 -pipe
+CXXFLAGS := $(CFLAGS)
 CPPFLAGS := -I src/include
 NASMFLAGS := -F dwarf -g
 LDFLAGS :=
@@ -40,7 +42,34 @@ override CFLAGS += \
     -mno-sse \
     -mno-sse2 \
     -mno-red-zone \
-    -mcmodel=kernel
+    -mcmodel=kernel \
+    -masm=intel \
+    -fno-omit-frame-pointer \
+    -falign-functions=16 \
+    -fno-exceptions \
+   
+
+override CXXFLAGS += \
+    -Wall \
+    -Wextra \
+    -std=c++17 \
+    -ffreestanding \
+    -fno-stack-protector \
+    -fno-stack-check \
+    -fno-PIC \
+    -m64 \
+    -march=x86-64 \
+    -mno-80387 \
+    -mno-mmx \
+    -mno-sse \
+    -mno-sse2 \
+    -mno-red-zone \
+    -mcmodel=kernel \
+    -masm=intel \
+    -fno-omit-frame-pointer \
+    -falign-functions=16 \
+    -fno-exceptions \
+    -fno-rtti
 
 override CPPFLAGS := \
     -I src \
@@ -91,6 +120,11 @@ obj/%.c.o: src/%.c GNUmakefile
 	mkdir -p "$$(dirname $@)"
 	$(CC) $(CFLAGS) $(CPPFLAGS) -c $< -o $@
 
+# Compilation rules for *.cpp files.
+obj/%.cpp.o: src/%.cpp GNUmakefile
+	mkdir -p "$$(dirname $@)"
+	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
+
 # Compilation rules for *.S files.
 obj/%.S.o: src/%.S GNUmakefile
 	mkdir -p "$$(dirname $@)"
@@ -101,10 +135,14 @@ obj/%.asm.o: src/%.asm GNUmakefile
 	mkdir -p "$$(dirname $@)"
 	nasm $(NASMFLAGS) $< -o $@
 
-# Rule for converting PSF fonts to object files
 obj/fonts/%.o: src/fonts/%.psf
-	mkdir -p obj/fonts
-	objcopy -I binary -O elf64-x86-64 -B i386:x86-64 $< $@
+	mkdir -p $(dir $@)
+	objcopy -I binary -O elf64-x86-64 -B i386:x86-64 \
+	  --rename-section .data=.rodata,alloc,load,readonly,data,contents \
+	  --set-section-flags .rodata=alloc,readonly \
+	  --add-section .note.GNU-stack=/dev/null --set-section-flags .note.GNU-stack=contents,noload \
+	  $< $@
+
 
 # Remove object files and the final executable.
 .PHONY: clean

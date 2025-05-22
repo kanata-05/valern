@@ -45,20 +45,22 @@ SECTIONS
     } :rodata
 
     /* Move to the next memory page for .data */
-    . = ALIGN(CONSTANT(MAXPAGESIZE));
-
-    .data : {
+    . = ALIGN(CONSTANT(MAXPAGESIZE));    .data : {
         *(.data .data.*)
     } :data
 
-    /* NOTE: .bss needs to be the last thing mapped to :data, otherwise lots of */
-    /* unnecessary zeros will be written to the binary. */
-    /* If you need, for example, .init_array and .fini_array, those should be placed */
-    /* above this. */
     .bss : {
         *(.bss .bss.*)
         *(COMMON)
+        . = ALIGN(16);
+        kernel_stack_bottom = .;
+        . += 32768;  /* 32 KiB kernel stack */
+        kernel_stack_top = .;
     } :data
+
+    /* Export stack symbols */
+    kernel_stack_bottom = kernel_stack_bottom;
+    kernel_stack_top = kernel_stack_top;
 
     /* Discard .note.* and .eh_frame* since they may cause issues on some hosts. */
     /DISCARD/ : {

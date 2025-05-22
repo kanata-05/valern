@@ -47,4 +47,4 @@ int psf_load_font(struct psf_font* font, void* data, size_t size);
 void psf_unload_font(struct psf_font* font);
 const uint8_t* psf_get_glyph(struct psf_font* font, unsigned int c);
 
-#endif
+#endif // PSF_H

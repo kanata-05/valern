@@ -3,7 +3,9 @@
 #include <stdbool.h>
 #include <limine.h>
 #include "stdmem.h" // Revised memory management shifted to this library.
-#include "console.h" // Console implementation
+#include "console.h"
+#include "gdt.h" 
+#include "paging.h" 
 
 // Set the base revision to 3, this is recommended as this is the latest
 // base revision described by the Limine boot protocol specification.
@@ -11,11 +13,6 @@
 
 __attribute__((used, section(".limine_requests")))
 static volatile LIMINE_BASE_REVISION(3);
-
-// The Limine requests can be placed anywhere, but it is important that
-// the compiler does not optimise them away, so, usually, they should
-// be made volatile or equivalent, _and_ they should be accessed at least
-// once or marked as used with the "used" attribute as done here.
 
 __attribute__((used, section(".limine_requests")))
 static volatile struct limine_framebuffer_request framebuffer_request = {
@@ -29,12 +26,18 @@ static volatile LIMINE_REQUESTS_START_MARKER;
 __attribute__((used, section(".limine_requests_end")))
 static volatile LIMINE_REQUESTS_END_MARKER;
 
+// Global GDT instance - placed in .data section and properly aligned
+static uint8_t gdt_storage[4096] __attribute__((section(".data"), aligned(0x1000)));
+
 // Halt and catch fire function.
 static void hcf(void) {
     for (;;) {
         asm ("hlt");
     }
 }
+
+// Declare stack symbols from linker script
+extern uint64_t kernel_stack_top;
 
 // The following will be our kernel's entry point.
 // If renaming kernel() to something else, make sure to change the
@@ -44,6 +47,19 @@ void kernel(void) {
     if (LIMINE_BASE_REVISION_SUPPORTED == false) {
         hcf();
     }
+
+    // Disable interrupts during initialization
+    __asm__ volatile("cli");    // Set up the stack pointer with proper alignment
+    __asm__ volatile(
+        "mov %0, rsp\n"
+        "and rsp, -16"      // Ensure 16-byte stack alignment using -16 (same as ~0xF)
+        : : "r"(&kernel_stack_top) : "memory"
+    );    // Initialize GDT
+    gdt_init((GDT*)gdt_storage);
+
+    // Initialize paging
+    init_paging();
+    printf("Paging Initialized!\n", BLUE, BLACK);
 
     // Ensure we got a framebuffer.
     if (framebuffer_request.response == NULL
@@ -56,13 +72,13 @@ void kernel(void) {
 
     // Initialize our console with the framebuffer
     init_shell(framebuffer);
+    printf("GDT Initialized!", BLUE, BLACK);
 
     printf("Welcome to Valern!\n", GRAY, BLACK);
     printf("A minimal operating system\n\n", GRAY, BLACK);
+    
     prompt();
 
-    // Main loop with keyboard handling
-    for (;;) {
-        asm volatile ("hlt");
-    }
+    hcf(); // Nothing else to do currently, halt.
+
 }
