@@ -19,18 +19,18 @@ ISO that you can use.
 # Information
 
 ## Kernel Status
-Currently, the following have been implemented into the kernel:
-
-PSF font support
-GDT (Partially)
-Paging (Partially)
-
-TODO:
-Bash shell
-Keyboard Input 
-Filesystem (FAT32)
-
-However, the TODO list will shrink and grow as the project goes on.
+Currently, the following have been implemented into the kernel:  
+  
+PSF font support  
+GDT (Partially)  
+Paging (Partially)  
+  
+TODO:  
+Bash shell  
+Keyboard Input  
+Filesystem (FAT32)  
+  
+However, the TODO list will shrink and grow as the project goes on.  
 
 ## Project
 > ### what
