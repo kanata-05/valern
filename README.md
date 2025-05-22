@@ -14,7 +14,7 @@
 ### make
 Just simply run `make` to create the kernel binaries which'll then call `build.sh`  
 to get the limine bootloader, which'll then call `build_ISO.sh` to create a bootable  
-ISO that you can use.
+ISO that you can use.  
 
 ## Information
 > ### what
