@@ -33,7 +33,9 @@ int load_font(struct psf_font* font, void* font_data, size_t font_size);
 void init_shell(struct limine_framebuffer* framebuffer);
 void console_clear(void);
 void putChar(char c, unsigned int fg_color, unsigned int bg_color);
-void printf(const char* str, unsigned int fg_color, unsigned int bg_color);
-void prompt(void);
+void printf(const char* format, unsigned int fg_color, unsigned int bg_color, ...);
+void shell(void);
+void process_command(const char* command);
 
 #endif // CONSOLE_H
+
