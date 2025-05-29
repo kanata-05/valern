@@ -65,10 +65,6 @@ void kernel(void) {
     keyboard_init();
     printf("Keyboard initialized!\n", GREEN, BLACK);
 
-    printf("Welcome to Valern!\n", GRAY, BLACK);
-    printf("A minimal operating system.\n\n", GRAY, BLACK);
-    printf("Starting shell...\n", BLUE, BLACK);
-
     printf("GDT TSS Started!\n\n", BLUE, BLACK);
 
     printf("Welcome to Valern!\n", GRAY, BLACK);
