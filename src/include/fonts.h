@@ -12,6 +12,6 @@ extern char _binary_src_fonts_default_psf_end[];
 extern char _binary_src_fonts_default_psf_size[];
 
 // The actual font data
-// extern uint8_t vga_font[256][16];  This is currently commented out for .psf file testing.
+extern uint8_t vga_font[256][16];  
 
 #endif // FONTS_H

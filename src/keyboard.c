@@ -1,5 +1,6 @@
 #include "keyboard.h"
 #include "stdmem.h"
+#include "port.h"
 #include <stdint.h>
 #include <stdbool.h>
 
@@ -62,17 +63,6 @@ static char key_buffer[KEY_BUFFER_SIZE];
 static volatile int buffer_head = 0;
 static volatile int buffer_tail = 0;
 static volatile int buffer_count = 0;
-
-// Port I/O functions
-static inline uint8_t inb(uint16_t port) {
-    uint8_t result;
-    asm volatile("inb %1, %0" : "=a"(result) : "Nd"(port));
-    return result;
-}
-
-static inline void outb(uint16_t port, uint8_t data) {
-    asm volatile("outb %0, %1" : : "a"(data), "Nd"(port));
-}
 
 // Wait for keyboard controller to be ready for input
 static void keyboard_wait_input(void) {

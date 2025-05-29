@@ -57,12 +57,24 @@ void kernel(void) {
     // Initialize our console with the framebuffer
     init_shell(framebuffer);
 
+    printf("Initializing interrupts...\n", BLUE, BLACK);
+    interrupts_init();
+    printf("Interrupts initialized!\n", GREEN, BLACK);
+
+    printf("Initializing keyboard...\n", BLUE, BLACK);
+    keyboard_init();
+    printf("Keyboard initialized!\n", GREEN, BLACK);
+
+    printf("Welcome to Valern!\n", GRAY, BLACK);
+    printf("A minimal operating system.\n\n", GRAY, BLACK);
+    printf("Starting shell...\n", BLUE, BLACK);
+
     printf("GDT TSS Started!\n\n", BLUE, BLACK);
 
     printf("Welcome to Valern!\n", GRAY, BLACK);
     printf("A minimal operating system.\n\n", GRAY, BLACK);
         
-    prompt();
+    shell();
 
     hcf(); // Nothing else to do currently, halt.
 }

@@ -29,17 +29,6 @@ static struct IDTPtr idtr;
 #define PIC2_COMMAND 0xA0
 #define PIC2_DATA    0xA1
 
-static inline uint8_t inb(uint16_t port) {
-    uint8_t result;
-    asm volatile("inb %1, %0" : "=a"(result) : "d"(port));
-    return result;
-}
-
-static inline void outb(uint16_t port, uint8_t data) {
-    asm volatile("outb %0, %1" : : "a"(data), "d"(port));
-}
-
-
 // Set an IDT entry
 static void idt_set_gate(int num, uint64_t handler, uint16_t selector, uint8_t flags) {
     idt[num].offset_low = handler & 0xFFFF;

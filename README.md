@@ -20,14 +20,22 @@ ISO that you can use.
 
 ## Kernel Status
 Currently, the following have been implemented into the kernel:  
-  
+
+--WORKING--
+Basic standard C ops
+Basic memory management ops  
 PSF font support  
-GDT (Partially)  
-Paging (Partially)  
+GDT
+
+--PARTIAL / BUG--
+Shell
+Interrupts System for keyboard
+Keyboard Driver
+Keyboard Input
+
   
 TODO:  
 Bash shell  
-Keyboard Input  
 Filesystem (FAT32)  
   
 However, the TODO list will shrink and grow as the project goes on.  

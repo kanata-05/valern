@@ -2,6 +2,7 @@
 #include "stdmem.h"
 #include "fonts.h"
 #include "keyboard.h"
+#include "port.h"
 #include <stdint.h>
 #include <stdarg.h>
 #include <stdbool.h>
@@ -39,7 +40,7 @@ void init_shell(struct limine_framebuffer* framebuffer) {
         // PSF font loading failed, fall back to VGA font
         console.font.width = 8;  // VGA font is 8x16
         console.font.height = 16;
-     // console.font.glyph_buffer = vga_font; This is currently commented out for .psf file testing.
+        console.font.glyph_buffer = vga_font; 
         console.font.glyph_count = 256;
         console.font.glyph_size = 16;
         console.font.version = 0;  // Use 0 to indicate VGA font
