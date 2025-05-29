@@ -21,18 +21,18 @@ ISO that you can use.
 ## Kernel Status
 Currently, the following have been implemented into the kernel:  
 
---WORKING--
-Basic standard C ops
+--WORKING--  
+Basic standard C ops  
 Basic memory management ops  
 PSF font support  
 GDT
 
---PARTIAL / BUG--
-Shell
-Interrupts System for keyboard
-Keyboard Driver
-Keyboard Input
-
+--PARTIAL / BUG--  
+Shell  
+Interrupts System for keyboard  
+Keyboard Driver  
+Keyboard Input  
+  
   
 TODO:  
 Bash shell  
